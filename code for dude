@@ -1,0 +1,265 @@
+#include "ButtonIRQ.h"
+#include <Adafruit_NeoPixel.h>
+#include <LiquidCrystal_I2C.h>
+#include  <Wire.h>
+#include <BH1750.h>
+
+#define PIN        9 
+#define NUMPIXELS 12 
+
+BH1750 lightMeter;  
+ButtonIRQ rightbutton(47);//must be either 2 or 3 (UNO R3)
+Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+LiquidCrystal_I2C lcd(0x27,  16, 2);
+
+bool togsw = false;
+bool result;
+int potpin = 9;
+int ledpin = 31;
+int enA = 11;
+int in1 = 10;
+int in2 = 8;
+
+void setup() {
+  lcd.init();
+  lcd.backlight();
+  pixels.begin(); 
+  pixels.setBrightness(120);
+  delay(2000);
+  rightbutton.begin(115200);
+  pinMode(ledpin ,OUTPUT);
+  pinMode(enA, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  Wire.begin(); 
+  lightMeter.begin();
+ 
+}
+void loop() {
+  neopot();
+  //light(7);
+ //motor(100);
+
+  
+  
+}
+void neocycle(int d ,int r ,int g, int b, bool direction){
+  if(direction){
+    neoccw(d, r ,g, b);
+  } else{
+    neocw(d, r ,g, b);
+  }
+}
+
+
+int fuck_off(){
+   if(togsw){
+    Serial.println("working");
+     lcd.setCursor(3,0);
+     lcd.clear();
+     lcd.print("):");
+     
+     
+   }
+   else{
+    lcd.setCursor(0,0);
+    lcd.print("(:");
+    Serial.println(" not working");
+   
+   }
+  
+} 
+
+int potlcd(){
+  int val = analogRead(potpin);
+  lcd.setCursor(3,0);
+  lcd.print(val);
+  delay(20);
+  lcd.clear();
+  Serial.println(val);
+ 
+}
+
+
+int neoccw(int d ,int r ,int g, int b){  
+  for(int i = NUMPIXELS; i > 0; i--) { 
+    pixels.clear();
+    pixels.setPixelColor(i, pixels.Color(r+10*i, g+0*i, b+30*i));
+    pixels.show();   
+
+    delay(d);}   
+}
+
+void checkbutton(){
+    result = rightbutton.isTrue();
+  if(result){
+    togsw = !togsw;
+  }
+}
+
+int neocw(int d ,int r ,int g, int b){
+  for(int i=0; i<NUMPIXELS; i++) { 
+    pixels.clear();
+    pixels.setPixelColor(i, pixels.Color(r+10*i, g+0*i, b+30*i));
+    pixels.show();   
+
+    delay(d);}
+}
+
+
+void neopot(){
+  float val = analogRead(potpin);
+  val = analogRead(potpin);            
+  val = map(val, 0, 1023, -1, 12);
+  Serial.println(val);
+  if(val < 2){
+    
+    pixels.setPixelColor(1, pixels.Color(255,0 ,0));
+    
+  }
+  else{
+    pixels.setPixelColor(1, pixels.Color(0,0 , 0));
+  }
+
+ if(val > 1 ,val < 3){
+    
+    pixels.setPixelColor(2, pixels.Color(255,127 ,0 ));
+    
+  }
+  else{
+    pixels.setPixelColor(2, pixels.Color(0,0 , 0));
+  }
+   if(val > 2 ,val < 4){
+    
+    pixels.setPixelColor(3, pixels.Color(255,255, 0));
+    
+  }
+  else{
+    pixels.setPixelColor(3, pixels.Color(0,0 , 0));
+  }
+   if(val > 3, val < 5){
+    
+    pixels.setPixelColor(4, pixels.Color(127,255,0 ));
+    
+  }
+  else{
+    pixels.setPixelColor(4, pixels.Color(0,0 , 0));
+  }
+    if(val > 4, val < 6){
+    
+    pixels.setPixelColor(5, pixels.Color(0,255 , 0));
+    
+  }
+  else{
+    pixels.setPixelColor(5, pixels.Color(0,0,0));
+  }
+    if(val > 5, val < 7){
+    
+    pixels.setPixelColor(6, pixels.Color(0,255 , 127));
+    
+  }
+  else{
+    pixels.setPixelColor(6, pixels.Color(0,0 , 0));
+  }
+    if(val > 6, val < 8){
+    
+    pixels.setPixelColor(7, pixels.Color(0 , 255,255));
+    
+  }
+  else{
+    pixels.setPixelColor(7, pixels.Color(0,0 , 0));
+  }
+    if(val > 7, val < 9){
+    
+    pixels.setPixelColor(8, pixels.Color(0,127 , 255));
+    
+  }
+  else{
+    pixels.setPixelColor(8, pixels.Color(0,0 , 0));
+  }
+    if(val > 8, val < 10){
+    
+    pixels.setPixelColor(9, pixels.Color(0,0 , 255));
+    
+  }
+  else{
+    pixels.setPixelColor(9, pixels.Color(0,0 , 0));
+  }
+    if(val > 9, val < 11){
+    
+    pixels.setPixelColor(10, pixels.Color(127,0 , 255));
+    
+  }
+  else{
+    pixels.setPixelColor(10, pixels.Color(0,0 , 0));
+  }
+    if(val > 10, val < 12){
+    
+    pixels.setPixelColor(11, pixels.Color(255,0 , 255));
+    
+  }
+  else{
+    pixels.setPixelColor(11, pixels.Color(0,0 , 0));
+  }
+    if(val > 11, val < 13){
+    
+    pixels.setPixelColor(12, pixels.Color(122,0 , 255));
+    
+  }
+  else{
+    pixels.setPixelColor(12, pixels.Color(0,0 , 0));
+  }
+    if(val > -1, val < 0){
+    
+    pixels.setPixelColor(0, pixels.Color(255,0 , 127));
+    
+  }
+  else{
+    pixels.setPixelColor(0, pixels.Color(0,0 , 0));
+  }
+
+  
+
+  pixels.show();
+}
+
+void led(){
+  
+  digitalWrite(ledpin, HIGH);
+  delay(200);
+  digitalWrite(ledpin, LOW);
+  delay(200);
+
+}
+
+void light(int night){
+  float lux = lightMeter.readLightLevel(); 
+  lcd.setCursor(0,0);
+  lcd.print("lux is ");
+  lcd.print(lux);
+  delay(60);
+  lcd.clear();
+  if(lux < night){
+    pixels.clear();
+  }
+  else{
+    pixels.setPixelColor(1, pixels.Color(255,0 , 0));
+  }
+  pixels.show();
+
+  
+}
+
+
+void motor(int speed){
+ analogWrite(enA, speed);
+ digitalWrite(in1, LOW);
+ digitalWrite(in2, HIGH);
+ if(speed < 0){
+  analogWrite(enA, speed);
+ digitalWrite(in1, HIGH);
+ digitalWrite(in2,LOW);
+ }
+}
+
+
